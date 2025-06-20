@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Time.Off.Application\Time.Off.Application.csproj" />
+    <ProjectReference Include="..\Time.Off.Infrastructure\Time.Off.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

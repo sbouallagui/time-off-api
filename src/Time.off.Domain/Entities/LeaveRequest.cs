@@ -1,4 +1,7 @@
-﻿namespace Time.off.Domain;
+﻿using Time.off.Domain.Enums;
+using Time.off.Domain.ValueObjects;
+
+namespace Time.off.Domain.Entities;
 
 public class LeaveRequest
 {
@@ -13,7 +16,7 @@ public class LeaveRequest
     // Constructeur de création
     public LeaveRequest(Guid employeeId, LeavePeriod period, LeaveType type, string? comment = null)
     {
-        if (period == null) throw new ArgumentNullException(nameof(period));
+        ArgumentNullException.ThrowIfNull(period);
 
         Id = Guid.NewGuid();
         EmployeeId = employeeId;
@@ -24,7 +27,6 @@ public class LeaveRequest
         CreatedAt = DateTime.UtcNow;
     }
 
-    // Méthodes métier possibles (ex : Annuler)
     public void Cancel()
     {
         if (Status != LeaveRequestStatus.Pending)

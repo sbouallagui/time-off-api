@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Time.off.Domain.Enums;
 
 namespace Time.Off.Application.UseCases.SubmitLeaveRequest
 {
-    internal class SubmitLeaveRequestCommand
-    {
-    }
+    public record RequestLeaveCommand(
+        Guid EmployeeId,
+        DateTime StartDate,
+        DateTime EndDate,
+        LeaveType Type,
+        string? Comment);
 }

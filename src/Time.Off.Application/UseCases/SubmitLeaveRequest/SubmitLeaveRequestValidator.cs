@@ -1,12 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Time.Off.Application.UseCases.SubmitLeaveRequest;
 
-namespace Time.Off.Application.UseCases.SubmitLeaveRequest
+using FluentValidation;
+
+public class SubmitLeaveRequestValidator : AbstractValidator<RequestLeaveCommand>
 {
-    internal class SubmitLeaveRequestValidator
+    public SubmitLeaveRequestValidator()
     {
+        RuleFor(x => x.EmployeeId)
+            .NotEmpty().WithMessage("Employee ID is required.");
+
+        RuleFor(x => x.StartDate)
+            .LessThanOrEqualTo(x => x.EndDate)
+            .WithMessage("Start date must be before or equal to end date.");
+
+        RuleFor(x => x.Type)
+            .IsInEnum()
+            .WithMessage("Invalid leave type.");
     }
 }
+
