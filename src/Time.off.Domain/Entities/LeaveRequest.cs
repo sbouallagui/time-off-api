@@ -1,7 +1,7 @@
-﻿using Time.off.Domain.Enums;
-using Time.off.Domain.ValueObjects;
+﻿using Time.Off.Domain.Enums;
+using Time.Off.Domain.ValueObjects;
 
-namespace Time.off.Domain.Entities;
+namespace Time.Off.Domain.Entities;
 
 public class LeaveRequest
 {

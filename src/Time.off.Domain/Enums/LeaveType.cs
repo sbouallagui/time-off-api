@@ -1,4 +1,4 @@
-﻿namespace Time.off.Domain.Enums;
+﻿namespace Time.Off.Domain.Enums;
 
 public enum LeaveType
 {

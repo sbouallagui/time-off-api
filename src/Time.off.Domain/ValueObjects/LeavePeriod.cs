@@ -1,4 +1,4 @@
-﻿namespace Time.off.Domain.ValueObjects;
+﻿namespace Time.Off.Domain.ValueObjects;
 
 public record LeavePeriod
 {

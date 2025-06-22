@@ -1,9 +1,9 @@
 using FluentValidation;
 using Microsoft.OpenApi.Models;
-using Time.off.Domain.Repositories;
+using Time.Off.Domain.Repositories;
 using Time.Off.Application.UseCases.SubmitLeaveRequest;
 using Time.Off.Infrastructure.Repositories;
-
+using Time.Off.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +13,8 @@ builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiIn
     Version = "v1",
     Description = "API for submitting leave requests",
 }));
+
+builder.Services.AddDatabaseConfiguration();
 builder.Services.AddScoped<IValidator<RequestLeaveCommand>, SubmitLeaveRequestValidator>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<SubmitLeaveRequestHandler>();
@@ -42,4 +44,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

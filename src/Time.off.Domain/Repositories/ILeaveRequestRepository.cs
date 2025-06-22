@@ -1,8 +1,8 @@
-﻿using Time.off.Domain.Entities;
+﻿using Time.Off.Domain.Entities;
 
-namespace Time.off.Domain.Repositories;
+namespace Time.Off.Domain.Repositories;
 
 public interface ILeaveRequestRepository
 {
-    Task AddAsync(LeaveRequest leaveRequest);
+    public Task<Guid> AddAsync(LeaveRequest leaveRequest);
 }

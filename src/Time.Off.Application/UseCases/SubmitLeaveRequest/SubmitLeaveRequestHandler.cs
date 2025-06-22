@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using Time.Off.Application.Common;
-using Time.off.Domain.Entities;
-using Time.off.Domain.Repositories;
-using Time.off.Domain.ValueObjects;
+using Time.Off.Domain.Entities;
+using Time.Off.Domain.Repositories;
+using Time.Off.Domain.ValueObjects;
+
 
 namespace Time.Off.Application.UseCases.SubmitLeaveRequest
 {
@@ -23,9 +24,9 @@ namespace Time.Off.Application.UseCases.SubmitLeaveRequest
             var period = new LeavePeriod(command.StartDate, command.EndDate);
             var leaveRequest = new LeaveRequest(command.EmployeeId, period, command.Type, command.Comment);
 
-            //await _repository.AddAsync(leaveRequest);
+            var lastInsertedId = await _repository.AddAsync(leaveRequest);
 
-            return OperationResult<Guid>.Success(leaveRequest.Id);
+            return OperationResult<Guid>.Success(lastInsertedId);
         }
     }
 }
