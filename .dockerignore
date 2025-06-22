@@ -1,0 +1,9 @@
+.vs
+src/**/bin
+src/**/obj
+*.user
+*.suo
+*.csproj.user
+Dockerfile.*
+docker-compose.*
+
