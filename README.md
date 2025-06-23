@@ -38,6 +38,16 @@ docker-compose up -d
 ```
 This will start a PostgreSQL container with the TimeOff database and initialize tables via the /docker-entrypoint-initdb.d scripts.
 
+### Resetting the Database (Dev)
+If you need to reset the PostgreSQL database and reload initial data (from init.sql), follow these steps:
+- Remove existing containers and data volumes
+```bash
+docker-compose down -v
+```
+- Recreate the database and load initial data
+```bash
+docker-compose up -d
+```
 ##  Run the API Locally
 
 From the src/Time.Off.Api/ directory:
