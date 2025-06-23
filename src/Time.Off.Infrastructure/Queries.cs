@@ -9,4 +9,20 @@ public static class Queries
         (@Id, @EmployeeId, @StartDate, @EndDate, @Type::leavetype, @Comment, @Status::leaverequeststatus, @CreatedAt, @ModifiedAt)
     RETURNING Id;
     ";
+
+    public const string GetLeaveRequestById = @"
+    SELECT 
+        Id,
+        EmployeeId,
+        Type::text AS Type,
+        Comment,
+        Status::text AS Status,
+        CreatedAt,
+        ModifiedAt,
+        StartDate,
+        EndDate
+    FROM LeaveRequest
+    WHERE Id = @Id;
+    ";
+
 }

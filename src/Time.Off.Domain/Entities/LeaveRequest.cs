@@ -7,7 +7,7 @@ public class LeaveRequest
 {
     public Guid Id { get; private set; }
     public Guid EmployeeId { get; private set; }
-    public LeavePeriod Period { get; private set; }
+    public LeavePeriod? Period { get; private set; }
     public LeaveType Type { get; private set; }
     public string? Comment { get; private set; }
     public LeaveRequestStatus Status { get; private set; }
@@ -26,6 +26,8 @@ public class LeaveRequest
         Status = LeaveRequestStatus.Pending;
         CreatedAt = DateTime.UtcNow;
     }
+
+    public LeaveRequest() { }
 
     public void Cancel()
     {

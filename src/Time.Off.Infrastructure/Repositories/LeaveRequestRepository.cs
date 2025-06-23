@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Time.Off.Domain.Entities;
 using Time.Off.Domain.Repositories;
+using Time.Off.Domain.ValueObjects;
 using Time.Off.Infrastructure.Contexts;
+using Time.Off.Infrastructure.Dtos;
 
 namespace Time.Off.Infrastructure.Repositories;
 
@@ -24,8 +26,8 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
             {
                 leaveRequest.Id,
                 leaveRequest.EmployeeId,
-                leaveRequest.Period.StartDate,
-                leaveRequest.Period.EndDate,
+                leaveRequest.Period?.StartDate,
+                leaveRequest.Period?.EndDate,
                 Type = leaveRequest.Type.ToString(),
                 leaveRequest.Comment,
                 Status = leaveRequest.Status.ToString(),
@@ -45,4 +47,38 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
         }
     }
 
+    public async Task<LeaveRequest?> GetByIdAsync(Guid id)
+    {
+        try
+        {
+            string query = Queries.GetLeaveRequestById;
+
+            using var connection = _context.CreateConnection();
+            await connection.OpenAsync();
+
+            var leaveRequests = await connection.QueryAsync<LeaveRequestDto, LeavePeriod, LeaveRequest>(
+                query,
+                (dto, period) =>
+                {
+                    var lr = new LeaveRequest(dto.EmployeeId, period, dto.Type, dto.Comment);
+
+                    var type = typeof(LeaveRequest);
+                    type.GetProperty("Id")?.SetValue(lr, dto.Id);
+                    type.GetProperty("Status")?.SetValue(lr, dto.Status);
+                    type.GetProperty("ModifiedAt")?.SetValue(lr, dto.ModifiedAt);
+
+                    return lr;
+                },
+                param: new { Id = id },
+                splitOn: "StartDate"
+            );
+
+            return leaveRequests.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching LeaveRequest with Id {LeaveRequestId}", id);
+            throw;
+        }
+    }
 }

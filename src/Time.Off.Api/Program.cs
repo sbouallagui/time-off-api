@@ -7,6 +7,8 @@ using Time.Off.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 using Time.Off.Api.SwaggerExamples;
 using Microsoft.AspNetCore.Mvc;
+using Time.Off.Application.UseCases.GetLeaveRequest;
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -37,7 +39,12 @@ builder.Services.AddDatabaseConfiguration();
 builder.Services.AddScoped<IValidator<RequestLeaveCommand>, SubmitLeaveRequestValidator>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<SubmitLeaveRequestHandler>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<GetLeaveRequestByIdHandler>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

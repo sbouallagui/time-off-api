@@ -2,7 +2,9 @@
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using Time.Off.Api.SwaggerExamples;
+using Time.Off.Application.UseCases.GetLeaveRequest;
 using Time.Off.Application.UseCases.SubmitLeaveRequest;
+using Time.Off.Domain.Entities;
 
 namespace Time.Off.Api.Controllers;
 
@@ -10,9 +12,11 @@ namespace Time.Off.Api.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
+    GetLeaveRequestByIdHandler getHandler,
     ILogger<LeaveRequestsController> logger) : ControllerBase
 {
     private readonly SubmitLeaveRequestHandler _submitHandler = submitHandler;
+    private readonly GetLeaveRequestByIdHandler _getHandler = getHandler;
     private readonly ILogger<LeaveRequestsController> _logger = logger;
 
     [HttpPost]
@@ -43,13 +47,20 @@ public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
     }
 
     [HttpGet("{id:guid}")]
+    [SwaggerOperation(
+        Summary = "Get leave request by Id",
+        Description = "Returns the details of a specific leave request."
+    )]
+    [SwaggerResponse(200, "Leave request found", typeof(LeaveRequest))]
+    [SwaggerResponse(404, "Leave request not found")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        //var result = await _getHandler.HandleAsync(id);
+        var result = await _getHandler.HandleAsync(new GetLeaveRequestByIdQuery(id));
 
-        //if (!result.IsSuccess)
-        //    return NotFound(new { Error = result.ErrorMessage });
+        if (!result.IsSuccess)
+            return NotFound(new { Error = result.ErrorMessage });
 
-        return Ok();
+        return Ok(result.Value);
     }
+
 }
