@@ -38,7 +38,36 @@ CREATE TABLE IF NOT EXISTS LeaveRequest (
 );
 
 -- Insert sample employees
-INSERT INTO Employee (Id, FirstName, LastName, Email) VALUES
-('11111111-1111-1111-1111-111111111111', 'John', 'Doe', 'john.doe@example.com'),
-('22222222-2222-2222-2222-222222222222', 'Jane', 'Smith', 'jane.smith@example.com'),
-('33333333-3333-3333-3333-333333333333', 'Charlie', 'Brown', 'charlie.brown@example.com');
+INSERT INTO Employee (Id, FirstName, LastName, Email)
+VALUES
+    ('11111111-1111-1111-1111-111111111111', 'Karine',    'Ferri',   'karine.ferri@example.com'),
+    ('22222222-2222-2222-2222-222222222222', 'Jean-Pierre',    'Foucault', 'jeanpierre.foucault@example.com'),
+    ('33333333-3333-3333-3333-333333333333', 'Laurent', 'Mariotte', 'laurent.mariotte@example.com'),
+    ('44444444-4444-4444-4444-444444444444', 'Jean-Luc', 'Reichmann', 'jeanluc.reichmann@example.com');
+; 
+
+-- Insert a test leave request
+INSERT INTO LeaveRequest (
+    Id,
+    EmployeeId,
+    StartDate,
+    EndDate,
+    Type,
+    Comment,
+    Status,
+    CreatedAt,
+    ModifiedAt
+)
+VALUES (
+    '22222222-2222-2222-2222-222222222222',  -- test LeaveRequest Id
+    '11111111-1111-1111-1111-111111111111',  -- existing Employee Id
+    '2025-06-23',
+    '2025-06-27',
+    'PaidLeave', 
+    'Test leave request for initial data',
+    'Pending', 
+    NOW(),
+    NULL
+);
+
+
