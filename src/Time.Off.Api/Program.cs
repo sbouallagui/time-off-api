@@ -4,15 +4,34 @@ using Time.Off.Domain.Repositories;
 using Time.Off.Application.UseCases.SubmitLeaveRequest;
 using Time.Off.Infrastructure.Repositories;
 using Time.Off.Infrastructure;
+using Swashbuckle.AspNetCore.Filters;
+using Time.Off.Api.SwaggerExamples;
+using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo
+
+builder.Services.AddSwaggerGen(c =>
 {
-    Title = "Time Off API",
-    Version = "v1",
-    Description = "API for submitting leave requests",
-}));
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Time Off API",
+        Version = "v1",
+        Description = "API for submitting leave requests",
+    });
+
+    c.EnableAnnotations();
+    c.ExampleFilters();
+});
+
+builder.Services.AddSwaggerExamplesFromAssemblyOf<RequestLeaveCommandExample>();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
 
 builder.Services.AddDatabaseConfiguration();
 builder.Services.AddScoped<IValidator<RequestLeaveCommand>, SubmitLeaveRequestValidator>();
@@ -23,6 +42,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

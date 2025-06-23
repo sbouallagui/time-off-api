@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
+using Time.Off.Api.SwaggerExamples;
 using Time.Off.Application.UseCases.SubmitLeaveRequest;
 
 namespace Time.Off.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler) : ControllerBase
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
+    ILogger<LeaveRequestsController> logger) : ControllerBase
 {
     private readonly SubmitLeaveRequestHandler _submitHandler = submitHandler;
+    private readonly ILogger<LeaveRequestsController> _logger = logger;
 
     [HttpPost]
     [SwaggerOperation(
@@ -17,14 +22,24 @@ public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler) : 
     )]
     [SwaggerResponse(200, "Leave request submitted successfully", typeof(object))]
     [SwaggerResponse(400, "Invalid leave request data or validation error", typeof(object))]
+    [SwaggerResponse(500, "An unexpected server error occurred")]
+    [SwaggerRequestExample(typeof(RequestLeaveCommand), typeof(RequestLeaveCommandExample))]
     public async Task<IActionResult> RequestLeave([FromBody, SwaggerParameter("The leave request details", Required = true)] RequestLeaveCommand command)
     {
-        var result = await _submitHandler.HandleAsync(command);
+        try
+        {
+            var result = await _submitHandler.HandleAsync(command);
 
-        if (!result.IsSuccess)
-            return BadRequest(new { Error = result.ErrorMessage});
+            if (!result.IsSuccess)
+                return BadRequest(new { Error = result.ErrorMessage });
 
-        return Ok(new { RequestId = result.Value });
+            return Ok(new { RequestId = result.Value });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while submitting a leave request");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please contact support." });
+        }
     }
 
     [HttpGet("{id:guid}")]
