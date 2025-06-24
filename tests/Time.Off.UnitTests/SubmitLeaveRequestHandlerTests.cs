@@ -6,6 +6,7 @@ using Time.Off.Application.UseCases.SubmitLeaveRequest;
 using Time.Off.Domain.Entities;
 using Time.Off.Domain.Enums;
 using Time.Off.Domain.Repositories;
+using Time.Off.Domain.ValueObjects;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace Time.Off.UnitTests;
@@ -29,8 +30,8 @@ public class SubmitLeaveRequestHandlerTests
         // Arrange
         var command = new RequestLeaveCommand(
             Guid.NewGuid(),
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddDays(5),
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5)),
             LeaveType.PaidLeave,
             "Test request"
         );
@@ -60,8 +61,8 @@ public class SubmitLeaveRequestHandlerTests
         // Arrange
         var command = new RequestLeaveCommand(
             Guid.NewGuid(),
-            DateTime.UtcNow,
-            DateTime.UtcNow.AddDays(-1), // StartDate must be before EndDate
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
             LeaveType.PaidLeave,
             "Invalid request"
         );
@@ -83,4 +84,40 @@ public class SubmitLeaveRequestHandlerTests
         result.ErrorMessage.Should().Contain("StartDate must be before EndDate");
         _repositoryMock.Verify(r => r.AddAsync(It.IsAny<LeaveRequest>()), Times.Never);
     }
+
+    [Fact]
+    public async Task HandleAsync_Should_Return_Failure_When_Pending_Request_Exists_For_Same_Period()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var startDate = new DateOnly(2024, 06, 23);
+        var endDate = new DateOnly(2024, 06, 28);
+
+        var command = new RequestLeaveCommand(
+            employeeId,
+            startDate,
+            endDate,
+            LeaveType.PaidLeave,
+            "Overlap test"
+        );
+
+        _validatorMock
+            .Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
+        _repositoryMock
+            .Setup(r => r.ExistsPendingRequestForPeriodAsync(employeeId, It.IsAny<LeavePeriod>()))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _handler.HandleAsync(command);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Value.Should().Be(Guid.Empty);
+
+        _repositoryMock.Verify(r => r.ExistsPendingRequestForPeriodAsync(employeeId, It.IsAny<LeavePeriod>()), Times.Once);
+        _repositoryMock.Verify(r => r.AddAsync(It.IsAny<LeaveRequest>()), Times.Never); // ensure no insert happened
+    }
+
 }

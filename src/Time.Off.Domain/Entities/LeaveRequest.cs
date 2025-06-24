@@ -12,8 +12,9 @@ public class LeaveRequest
     public string? Comment { get; private set; }
     public LeaveRequestStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime? ModifiedAt { get; private set; }
 
-    // Constructeur de création
+    // Creation constructor
     public LeaveRequest(Guid employeeId, LeavePeriod period, LeaveType type, string? comment = null)
     {
         ArgumentNullException.ThrowIfNull(period);
@@ -27,13 +28,33 @@ public class LeaveRequest
         CreatedAt = DateTime.UtcNow;
     }
 
+    // Parameterless constructor for ORM or serialization
     public LeaveRequest() { }
 
     public void Cancel()
     {
-        if (Status != LeaveRequestStatus.Pending)
-            throw new InvalidOperationException("Only pending requests can be cancelled.");
-
+        EnsureStatusIsPending("cancelled");
         Status = LeaveRequestStatus.Cancelled;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void Approve()
+    {
+        EnsureStatusIsPending("approved");
+        Status = LeaveRequestStatus.Approved;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void Reject()
+    {
+        EnsureStatusIsPending("rejected");
+        Status = LeaveRequestStatus.Rejected;
+        ModifiedAt = DateTime.UtcNow;
+    }
+
+    private void EnsureStatusIsPending(string action)
+    {
+        if (Status != LeaveRequestStatus.Pending)
+            throw new InvalidOperationException($"Only pending requests can be {action}.");
     }
 }

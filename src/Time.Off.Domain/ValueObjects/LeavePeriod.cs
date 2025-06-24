@@ -2,12 +2,12 @@
 
 public record LeavePeriod
 {
-    public DateTime StartDate { get; init; }
-    public DateTime EndDate { get; init; }
+    public DateOnly StartDate { get; init; }
+    public DateOnly EndDate { get; init; }
 
     public LeavePeriod() { }
 
-    public LeavePeriod(DateTime startDate, DateTime endDate)
+    public LeavePeriod(DateOnly startDate, DateOnly endDate)
     {
         if (endDate < startDate)
             throw new ArgumentException("End date cannot be before start date.");

@@ -25,4 +25,13 @@ public static class Queries
     WHERE Id = @Id;
     ";
 
+    public const string ExistsPendingRequestForPeriodQuery = @"
+        SELECT 1
+        FROM LeaveRequest
+        WHERE EmployeeId = @EmployeeId
+          AND Status = 'Pending'
+          AND StartDate = @StartDate
+          AND EndDate = @EndDate
+        LIMIT 1
+    ";
 }

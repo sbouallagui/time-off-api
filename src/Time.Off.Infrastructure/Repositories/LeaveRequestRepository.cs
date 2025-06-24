@@ -26,8 +26,8 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
             {
                 leaveRequest.Id,
                 leaveRequest.EmployeeId,
-                leaveRequest.Period?.StartDate,
-                leaveRequest.Period?.EndDate,
+                StartDate = leaveRequest.Period?.StartDate.ToDateTime(TimeOnly.MinValue),
+                EndDate = leaveRequest.Period?.EndDate.ToDateTime(TimeOnly.MinValue),
                 Type = leaveRequest.Type.ToString(),
                 leaveRequest.Comment,
                 Status = leaveRequest.Status.ToString(),
@@ -56,10 +56,15 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
             using var connection = _context.CreateConnection();
             await connection.OpenAsync();
 
-            var leaveRequests = await connection.QueryAsync<LeaveRequestDto, LeavePeriod, LeaveRequest>(
+            var leaveRequests = await connection.QueryAsync<LeaveRequestDto, LeavePeriodDto, LeaveRequest>(
                 query,
-                (dto, period) =>
+                (dto, periodDto) =>
                 {
+                    // Convert DateTime to DateOnly here
+                    var period = new LeavePeriod(
+                    DateOnly.FromDateTime(periodDto.StartDate),
+                    DateOnly.FromDateTime(periodDto.EndDate));
+
                     var lr = new LeaveRequest(dto.EmployeeId, period, dto.Type, dto.Comment);
 
                     var type = typeof(LeaveRequest);
@@ -80,5 +85,25 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
             _logger.LogError(ex, "Error fetching LeaveRequest with Id {LeaveRequestId}", id);
             throw;
         }
+    }
+
+    public async Task<bool> ExistsPendingRequestForPeriodAsync(Guid employeeId, LeavePeriod period)
+    {
+        string query = Queries.ExistsPendingRequestForPeriodQuery;
+
+
+        using var connection = _context.CreateConnection();
+        await connection.OpenAsync();
+
+        var result = await connection.ExecuteScalarAsync<int?>(
+            query,
+            new
+            {
+                EmployeeId = employeeId,
+                StartDate = period.StartDate.ToDateTime(TimeOnly.MinValue),
+                EndDate = period.EndDate.ToDateTime(TimeOnly.MinValue)
+            });
+
+        return result.HasValue;
     }
 }

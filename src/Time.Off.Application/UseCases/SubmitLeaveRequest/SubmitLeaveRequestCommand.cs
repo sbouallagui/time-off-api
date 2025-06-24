@@ -4,8 +4,8 @@ namespace Time.Off.Application.UseCases.SubmitLeaveRequest
 {
     public record RequestLeaveCommand(
         Guid EmployeeId,
-        DateTime StartDate,
-        DateTime EndDate,
+        DateOnly StartDate,
+        DateOnly EndDate,
         LeaveType Type,
         string? Comment);
 }

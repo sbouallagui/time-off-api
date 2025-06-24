@@ -27,6 +27,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<RequestLeaveCommandExample>();
+builder.Services.AddSwaggerExamplesFromAssemblyOf<LeaveRequestExample>();
+
 
 builder.Services.AddApiVersioning(options =>
 {

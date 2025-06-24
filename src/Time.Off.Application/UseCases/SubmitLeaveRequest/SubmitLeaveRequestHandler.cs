@@ -22,6 +22,16 @@ namespace Time.Off.Application.UseCases.SubmitLeaveRequest
             }
 
             var period = new LeavePeriod(command.StartDate, command.EndDate);
+            
+            var exists = await _repository.ExistsPendingRequestForPeriodAsync(command.EmployeeId, period);
+            if (exists)
+            {
+                return OperationResult<Guid>.Failure(
+                    $"A pending leave request already exists for employee {command.EmployeeId} " +
+                    $"from {period.StartDate:yyyy-MM-dd} to {period.EndDate:yyyy-MM-dd}."
+                );
+            }
+
             var leaveRequest = new LeaveRequest(command.EmployeeId, period, command.Type, command.Comment);
 
             var lastInsertedId = await _repository.AddAsync(leaveRequest);

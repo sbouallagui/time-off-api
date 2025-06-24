@@ -51,6 +51,7 @@ public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
         Summary = "Get leave request by Id",
         Description = "Returns the details of a specific leave request."
     )]
+    [SwaggerResponseExample(200, typeof(LeaveRequestExample))]
     [SwaggerResponse(200, "Leave request found", typeof(LeaveRequest))]
     [SwaggerResponse(404, "Leave request not found")]
     public async Task<IActionResult> GetById(Guid id)
