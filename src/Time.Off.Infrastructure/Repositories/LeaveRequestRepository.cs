@@ -106,4 +106,25 @@ public class LeaveRequestRepository(TimeOffDataBaseContext context, ILogger<Leav
 
         return result.HasValue;
     }
+
+    public async Task UpdateAsync(LeaveRequest leaveRequest)
+    {
+        string query = Queries.UpdateLeaveRequestStatus;
+
+        await using var connection = _context.CreateConnection();
+        await connection.OpenAsync();
+
+        var parameters = new
+        {
+            Id = leaveRequest.Id,
+            Status = leaveRequest.Status.ToString(),
+            ManagerComment = leaveRequest.ManagerComment,
+            ModifiedAt = DateTime.UtcNow
+        };
+
+        await connection.ExecuteAsync(query, parameters);
+    }
+
+
+
 }

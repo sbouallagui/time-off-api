@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Reflection.Metadata;
 using Time.Off.Api.SwaggerExamples;
 using Time.Off.Application.UseCases.GetLeaveRequest;
+using Time.Off.Application.UseCases.LeaveRequestDecision;
 using Time.Off.Application.UseCases.SubmitLeaveRequest;
 using Time.Off.Domain.Entities;
 
@@ -13,10 +15,12 @@ namespace Time.Off.Api.Controllers;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
     GetLeaveRequestByIdHandler getHandler,
+    LeaveRequestDecisionHandler decisionHandler,
     ILogger<LeaveRequestsController> logger) : ControllerBase
 {
     private readonly SubmitLeaveRequestHandler _submitHandler = submitHandler;
     private readonly GetLeaveRequestByIdHandler _getHandler = getHandler;
+    private readonly LeaveRequestDecisionHandler _decisionHandler = decisionHandler;
     private readonly ILogger<LeaveRequestsController> _logger = logger;
 
     [HttpPost]
@@ -62,6 +66,24 @@ public class LeaveRequestsController(SubmitLeaveRequestHandler submitHandler,
             return NotFound(new { Error = result.ErrorMessage });
 
         return Ok(result.Value);
+    }
+
+    [HttpPut("{leaveRequestId:guid}/review")]
+    [SwaggerOperation(
+        Summary = "Approve or reject a leave request",
+        Description = "Allows an HR manager to review a leave request by approving or rejecting it, optionally adding a comment."
+    )]
+    [SwaggerResponse(200, "Decision applied successfully")]
+    [SwaggerResponse(400, "Validation failed or leave request not found")]
+    public async Task<IActionResult> ReviewLeaveRequest( Guid leaveRequestId,
+    [FromBody] LeaveRequestDecisionCommand command)
+    {
+        var result = await _decisionHandler.HandleAsync(leaveRequestId, command);
+
+        if (result.IsSuccess)
+            return Ok(new { Message = "Decision applied successfully." });
+
+        return BadRequest(new { Error = result.ErrorMessage });
     }
 
 }

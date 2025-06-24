@@ -9,6 +9,7 @@ using Time.Off.Api.SwaggerExamples;
 using Microsoft.AspNetCore.Mvc;
 using Time.Off.Application.UseCases.GetLeaveRequest;
 using System.Text.Json.Serialization;
+using Time.Off.Application.UseCases.LeaveRequestDecision;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -39,9 +40,11 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddDatabaseConfiguration();
 builder.Services.AddScoped<IValidator<RequestLeaveCommand>, SubmitLeaveRequestValidator>();
+builder.Services.AddScoped<IValidator<LeaveRequestDecisionCommand>, LeaveRequestDecisionCommandValidator>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<SubmitLeaveRequestHandler>();
 builder.Services.AddScoped<GetLeaveRequestByIdHandler>();
+builder.Services.AddScoped<LeaveRequestDecisionHandler>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

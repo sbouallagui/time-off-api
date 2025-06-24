@@ -13,6 +13,7 @@ public class LeaveRequest
     public LeaveRequestStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ModifiedAt { get; private set; }
+    public string? ManagerComment { get; private set; }
 
     // Creation constructor
     public LeaveRequest(Guid employeeId, LeavePeriod period, LeaveType type, string? comment = null)
@@ -31,24 +32,19 @@ public class LeaveRequest
     // Parameterless constructor for ORM or serialization
     public LeaveRequest() { }
 
-    public void Cancel()
-    {
-        EnsureStatusIsPending("cancelled");
-        Status = LeaveRequestStatus.Cancelled;
-        ModifiedAt = DateTime.UtcNow;
-    }
-
-    public void Approve()
+    public void Approve(string? managerComment = null)
     {
         EnsureStatusIsPending("approved");
         Status = LeaveRequestStatus.Approved;
+        ManagerComment = managerComment;
         ModifiedAt = DateTime.UtcNow;
     }
 
-    public void Reject()
+    public void Reject(string? managerComment = null)
     {
         EnsureStatusIsPending("rejected");
         Status = LeaveRequestStatus.Rejected;
+        ManagerComment = managerComment;
         ModifiedAt = DateTime.UtcNow;
     }
 

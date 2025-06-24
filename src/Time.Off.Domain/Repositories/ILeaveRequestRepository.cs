@@ -8,5 +8,5 @@ public interface ILeaveRequestRepository
     Task<Guid> AddAsync(LeaveRequest leaveRequest);
     Task<LeaveRequest?> GetByIdAsync(Guid id);
     Task<bool> ExistsPendingRequestForPeriodAsync(Guid employeeId, LeavePeriod period);
-
+    Task UpdateAsync(LeaveRequest leaveRequest);
 }

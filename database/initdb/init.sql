@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS LeaveRequest (
     EndDate DATE NOT NULL,
     Type LeaveType NOT NULL,
     Comment TEXT,
+    ManagerComment TEXT NULL,
     Status LeaveRequestStatus NOT NULL DEFAULT 'Pending',
     CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ModifiedAt TIMESTAMPTZ NULL,
@@ -54,6 +55,7 @@ INSERT INTO LeaveRequest (
     EndDate,
     Type,
     Comment,
+    ManagerComment,
     Status,
     CreatedAt,
     ModifiedAt
@@ -65,6 +67,7 @@ VALUES (
     '2025-06-27',
     'PaidLeave', 
     'Test leave request for initial data',
+    NULL,
     'Pending', 
     NOW(),
     NULL

@@ -34,4 +34,13 @@ public static class Queries
           AND EndDate = @EndDate
         LIMIT 1
     ";
+
+    public const string UpdateLeaveRequestStatus = @"
+        UPDATE LeaveRequest
+        SET 
+            Status = @Status::leaverequeststatus,
+            ManagerComment = @ManagerComment,
+            ModifiedAt = @ModifiedAt
+        WHERE Id = @Id;
+    ";
 }
